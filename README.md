@@ -1,70 +1,41 @@
-## Unit 13 - ETL Case Study Project
-
+### ETL Case Study Project
+---
 ### Overview
 
-This week's class will introduce ETL design and require students to perform ETL on real datasets.
+This was a group project completed during my tenure at the UCB X Data Analysis course. The scope of the project encompass various ETL operations with Sql used our database. In this project we have decided to explore the relationship between the income and the housing price index for various regions.
 
-### Slide Shows
+### Hypothetical Use Case
 
-* [Introduction to ETL](1/Slide-Shows/ETL.pptx)
+In order to compare housing affordability by region for a specified time period (i.e., 2018), it is useful to create an index. One such index could be the ratio of a selected proxy for property value to a selected proxy for per capita income. That ratio can easily be calculated and visualized once all of the requisite datasets are in a centralized database.
 
-### ETL Project Guidelines
+### Data Sources
 
-## Team Effort
+As mentioned above, the two features required to arrive at an ‘affordability index’ by region for a specified time period are house price index and regional income per capita for said region. In this case, we will be looking at these features by state for 2018, and our data
+sources are:
+              * Federal Housing Finance Agency (FHFA) house price index ( source )
+              * Bureau of Economic Analysis (BEA) per capita regional income (source: BEA API )
+              * Wikipedia state names and abbreviations ( source )
+              
+### Data Transformation
+---
+## House Price Index
+ The house price index is available for download from the FHFA website as either a .txt or an .xls file that can be read into memory using Pandas.
 
-Due to the short timeline, teamwork will be crucial to the success of this project! Work closely with your team through all phases of the project to ensure that there are no surprises at the end of the week.
+ After having already inspected the regional income data (described in the next section), we decided to create a column identical to the one in that dataset called TimePeriod , into which we would essentially insert a concatenation of the yr and qtr columns. We then dropped every column except state,  index_sa (seasonally adjusted house price index), and TimePeriod , before exporting the result via SQL Alchemy ORM for use in the creation of our database.
 
-Working in a group enables you to tackle more difficult problems than you'd be able to working alone. In other words, working in a group allows you to **work smart** and **dream big**. Take advantage of it!
+## Regional Income
 
-## Project Proposal
+ The regional income data was pulled using the BEA API. Upon doing so, the resulting dataframe is immediately returned (thanks to the fabulously written Python BEA API wrapper, PyBEA)
 
-Before you start writing any code, remember that you only have one week to complete this project. View this project as a typical assignment from work. Imagine a bunch of data came in and you and your team are tasked with migrating it to a production data base.
-
-Take advantage of your Instructor and TA support during office hours and class project work time. They are a valuable resource and can help you stay on track.
-
-## Finding Data
-
-Your project must use 2 or more sources of data. We recommend the following sites to use as sources of data:
-
-* [data.world](https://data.world/)
-
-* [Kaggle](https://www.kaggle.com/)
-
-You can also use APIs or data scraped from the web. However, get approval from your instructor first. Again, there is only a week to complete this!
-
-## Data Cleanup & Analysis
-
-Once you have identified your datasets, perform ETL on the data. Make sure to plan and document the following:
-
-* The sources of data that you will extract from.
-
-* The type of transformation needed for this data (cleaning, joining, filtering, aggregating, etc).
-
-* The type of final production database to load the data into (relational or non-relational).
-
-* The final tables or collections that will be used in the production database.
-
-You will be required to submit a final technical report with the above information and steps required to reproduce your ETL process.
-
-## Project Report
-
-At the end of the week, your team will submit a Final Report that describes the following:
-
-* **E**xtract: your original data sources and how the data was formatted (CSV, JSON, MySQL, etc).
-
-* **T**ransform: what data cleaning or transformation was required.
-
-* **L**oad: the final database, tables/collections, and why this was chosen.
-
-Please upload the report to Github and submit a link to Bootcampspot.
-
-- - -
-
-### Copyright
-
-Coding Boot Camp © 2018. All Rights Reserved.
+ In addition to immediately identifying several columns that we would want to drop, we noticed that the listed GeoName for Alaska was followed by a space and an asterisk. Upon inspecting the unique values in the GeoName series, we discovered that all observations
+for Hawaii were recorded similarly. Consequently, we reformatted the GeoName series thusly . We then dropped every column except DataValue (per capita regional income), GeoName (state name), and TimePeriod , before exporting the result as a .csv file for use
+in the creation of our database.
 
 
-### Copyright
+## State Names and Abbreviations
+The state names and abbreviations were read into memory using Pandas’ read_html
+method. After transformation dropping unnecessary columns, the result was exported as a .csv file for use in the creation of our database.
+---
+### Database Creation
 
-Trilogy Education Services © 2019. All Rights Reserved.
+ We chose to create a relational database using MySQL Workbench, due to the fact that each dataset has either a state name or abbreviation as a feature. This would allow us to join the tables together using our freshly-created table of state names and abbreviations. A mix of SQL ALchemy and SQL Workbench functions were used to port our cleaned data table into the database . Finally, we wrote a query to join the house price index and regional income data for 2018 (by state) together using state name and abbreviation and TimePeriod .
