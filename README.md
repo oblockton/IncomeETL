@@ -17,7 +17,9 @@ sources are:
               * Wikipedia state names and abbreviations ( source )
               
 ### Data Transformation
+
 ---
+
 ## House Price Index
  The house price index is available for download from the FHFA website as either a .txt or an .xls file that can be read into memory using Pandas.
 
@@ -33,8 +35,9 @@ in the creation of our database.
 
 
 ## State Names and Abbreviations
-The state names and abbreviations were read into memory using Pandas’ read_html
-method. After transformation dropping unnecessary columns, the result was exported as a .csv file for use in the creation of our database.
+
+The state names and abbreviations were read into memory using Pandas’ read_html method. After transformation dropping unnecessary columns, the result was exported as a .csv file for use in the creation of our database.
+
 ---
 ### Database Creation
 
